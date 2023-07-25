@@ -1,0 +1,7 @@
+streamlit
+streamlit_chat
+langchain
+faiss-cpu
+
+
+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
