@@ -39,20 +39,6 @@ def reset_sessions():
     st.session_state["spinner_querying"] = st.empty()
 
 def init_chain():
-    ### For Local
-    # dotenv = find_dotenv(".env")
-    # if dotenv:
-    #     load_dotenv()
-
-    # if os.getenv("OPENAI_API_KEY"):
-    #     st.session_state["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-    # else:
-    #     st.text_input(
-    #         "OpenAI API Key",
-    #         value=st.session_state["OPENAI_API_KEY"], 
-    #         key="text_input_openai_api_key",
-    #         type="password"
-    #     )
 
     st.session_state["OPENAI_API_KEY"] = ""
     st.session_state["chain"] = None
