@@ -12,9 +12,9 @@ from langchain.chains import RetrievalQA
 
 
 dotenv.load_dotenv()
-#huggingfacehub_api_token = os.getenv("HUGGINGFACEHUB_API_KEY")
-os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
-#HUGGINGFACEHUB_API_KEY = "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"
+
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = "xxxxxxxxxxxxxxxxxxxxxxxxxx"
+
 
 st.header("Chat PDF")
 
