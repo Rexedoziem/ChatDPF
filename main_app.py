@@ -2,15 +2,19 @@ import dotenv
 import os
 import streamlit as st
 import tempfile
-from langchain.chat_models import ChatOpenAI
+from langchain.llms.huggingface_hub import HuggingFaceHub
 from langchain.embeddings.huggingface import HuggingFaceInstructEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import PyPDFLoader
 from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
+
+
 dotenv.load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")
+#huggingfacehub_api_token = os.getenv("HUGGINGFACEHUB_API_KEY")
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
+#HUGGINGFACEHUB_API_KEY = "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"
 
 st.header("Chat PDF")
 
@@ -28,7 +32,7 @@ if file is not None:
 
     question = st.text_input("Ask your question here:")
     if question:
-        llm = ChatOpenAI()
+        llm = HuggingFaceHub(repo_id="OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5", model_kwargs={"temperature":0.5, "max_length":512})
         chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=knowledge_base.as_retriever())
         response = chain.run(question)
         

@@ -5,16 +5,17 @@ import streamlit as st
 from streamlit_chat import message as chat
 from langchain.embeddings.huggingface import HuggingFaceInstructEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.chat_models import ChatOpenAI
+from langchain.llms.huggingface_hub import HuggingFaceHub
 from langchain.document_loaders import PyPDFLoader
 from langchain.vectorstores import FAISS
 from langchain.chains import ConversationalRetrievalChain
 
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 class Chain:
-    def __init__(self, openai_api_key):
+    def __init__(self, huggingfacehub_api_token):
         self.embeddings = HuggingFaceInstructEmbeddings(model_name="hku-nlp/instructor-base")
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
-        self.llm = ChatOpenAI(temperature=0, openai_api_key=openai_api_key)
+        self.llm = HuggingFaceHub(repo_id="OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5", model_kwargs={"temperature":0.5, "max_length":512})
         self.knowledge_base = None
         self.qa_chain = None
         self.chat_history = []
@@ -40,23 +41,25 @@ def reset_sessions():
 
 def init_chain():
 
-    st.session_state["OPENAI_API_KEY"] = ""
+    st.session_state["HUGGINGFACEHUB_API_KEY"] = ""
     st.session_state["chain"] = None
 
-    st.text_input(
-        "Openai API Key",
-        value=st.session_state["OPENAI_API_KEY"], 
-        key="text_input_openai_api_key",
+    st.session_state["HUGGINGFACEHUB_API_KEY"] = st.text_input(
+        "Huggingfacehub API Key",
+        value=st.session_state["HUGGINGFACEHUB_API_KEY"], 
+        key="text_input_huggingfacehub_api_key",
         type="password"
     )
 
     # TODO: validate api key
-    if st.session_state["OPENAI_API_KEY"]:
-        st.session_state["chain"] = Chain(st.session_state["OPENAI_API_KEY"])
+    if st.session_state["HUGGINGFACEHUB_API_KEY"]:
+        # Create a new Chain object only if it doesn't exist
+        if st.session_state["chain"] is None:
+            st.session_state["chain"] = Chain(st.session_state["HUGGINGFACEHUB_API_KEY"])
 
 def upsert_files():
     if st.session_state["chain"] is None:
-        st.session_state["chain"] = Chain(st.session_state["OPENAI_API_KEY"])
+        st.session_state["chain"] = Chain(st.session_state["HUGGINGFACEHUB_API_KEY"])
 
     for file in st.session_state["file_uploader"]:
         with tempfile.NamedTemporaryFile(delete=False) as tf:
@@ -82,7 +85,7 @@ if __name__ == "__main__":
 
     reset_sessions()
 
-    if "OPENAI_API_KEY" not in st.session_state:
+    if "HUGGINGFACEHUB_API_KEY" not in st.session_state:
         init_chain()
 
     file = st.file_uploader(
